@@ -1,0 +1,1611 @@
+@prefix : <http://www.hospital-otology.org/onto#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix swrl: <http://www.w3.org/2003/11/swrl#> .
+@prefix swrlb: <http://www.w3.org/2003/11/swrlb#> .
+@prefix ruleml: <http://www.w3.org/2003/11/ruleml#> .
+@base <http://www.hospital-otology.org/onto> .
+
+<http://www.hospital-otology.org/onto> rdf:type owl:Ontology ;
+                                      rdfs:comment "Comprehensive Clinical Otology Ontology - Production Ready v7.1"@en ;
+                                      owl:versionInfo "7.1" ;
+                                      rdfs:label "Hospital Otology Ontology" ;
+                                      owl:imports <http://www.w3.org/2003/11/swrl> .
+
+#################################################################
+#    Annotation Properties
+#################################################################
+
+rdfs:seeAlso rdf:type owl:AnnotationProperty .
+rdfs:label rdf:type owl:AnnotationProperty .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  Allergy Management Properties
+:hasAllergy rdf:type owl:ObjectProperty ;
+            owl:inverseOf :isAllergyOf ;
+            rdfs:domain :Patient ;
+            rdfs:range :Allergy ;
+            rdfs:comment "Links a patient to their documented allergies." ;
+            rdfs:label "has allergy" .
+
+:isAllergyOf rdf:type owl:ObjectProperty ;
+             rdfs:domain :Allergy ;
+             rdfs:range :Patient ;
+             rdfs:comment "Indicates which patient has this allergy." ;
+             rdfs:label "is allergy of" .
+
+:contraindicatesDrugClass rdf:type owl:ObjectProperty ;
+                          rdfs:domain :Allergy ;
+                          rdfs:range :DrugClass ;
+                          rdfs:comment "Links an allergy to drug classes that are contraindicated." ;
+                          rdfs:label "contraindicates drug class" .
+
+:contraindicatesMedication rdf:type owl:ObjectProperty ;
+                           rdfs:domain :Allergy ;
+                           rdfs:range :Medication ;
+                           rdfs:comment "Links an allergy to specific medications that are contraindicated." ;
+                           rdfs:label "contraindicates medication" .
+
+###  Medication Properties
+:belongsToDrugClass rdf:type owl:ObjectProperty ;
+                    rdfs:domain :Medication ;
+                    rdfs:range :DrugClass ;
+                    rdfs:comment "Links a medication to its pharmacological drug class(es)." ;
+                    rdfs:label "belongs to drug class" .
+
+:interactsWith rdf:type owl:ObjectProperty , owl:SymmetricProperty ;
+               rdfs:domain :Medication ;
+               rdfs:range :Medication ;
+               rdfs:comment "Indicates a drug-drug interaction between medications." ;
+               rdfs:label "interacts with" .
+
+###  Prescription Properties
+:prescribes rdf:type owl:ObjectProperty ;
+            owl:inverseOf :isPrescribedBy ;
+            rdfs:domain :HealthcareProfessional ;
+            rdfs:range :MedicationPrescription ;
+            rdfs:comment "Links a healthcare professional to prescriptions they write." ;
+            rdfs:label "prescribes" .
+
+:isPrescribedBy rdf:type owl:ObjectProperty ;
+                rdfs:domain :MedicationPrescription ;
+                rdfs:range :HealthcareProfessional ;
+                rdfs:comment "Indicates which healthcare professional prescribed this medication." ;
+                rdfs:label "is prescribed by" .
+
+:isPrescribedFor rdf:type owl:ObjectProperty , owl:FunctionalProperty ;
+                 rdfs:domain :MedicationPrescription ;
+                 rdfs:range :Patient ;
+                 rdfs:comment "Links a prescription to the patient it is for. Each prescription is for exactly one patient." ;
+                 rdfs:label "is prescribed for" .
+
+:hasPrescribedMedication rdf:type owl:ObjectProperty , owl:FunctionalProperty ;
+                         rdfs:domain :MedicationPrescription ;
+                         rdfs:range :Medication ;
+                         rdfs:comment "Links a prescription to the specific medication. Each prescription has exactly one medication." ;
+                         rdfs:label "has prescribed medication" .
+
+###  Condition and Diagnosis Properties
+:affectsStructure rdf:type owl:ObjectProperty ;
+                  owl:inverseOf :isAffectedBy ;
+                  rdfs:domain :Condition ;
+                  rdfs:range :AnatomicalStructure ;
+                  rdfs:comment "Links a condition to the anatomical structure(s) it affects." ;
+                  rdfs:label "affects structure" .
+
+:isAffectedBy rdf:type owl:ObjectProperty ;
+              rdfs:domain :AnatomicalStructure ;
+              rdfs:range :Condition ;
+              rdfs:comment "Indicates which condition(s) affect this anatomical structure." ;
+              rdfs:label "is affected by" .
+
+:hasDiagnosis rdf:type owl:ObjectProperty ;
+              owl:inverseOf :isDiagnosisOf ;
+              rdfs:domain :Patient ;
+              rdfs:range :Condition ;
+              rdfs:comment "Links a patient to their diagnosed conditions." ;
+              rdfs:label "has diagnosis" .
+
+:isDiagnosisOf rdf:type owl:ObjectProperty ;
+               rdfs:domain :Condition ;
+               rdfs:range :Patient ;
+               rdfs:comment "Indicates which patient has this diagnosis." ;
+               rdfs:label "is diagnosis of" .
+
+###  Clinical Process Properties
+:isPerformedBy rdf:type owl:ObjectProperty ;
+               owl:inverseOf :performs ;
+               rdfs:domain :ClinicalProcess ;
+               rdfs:range :HealthcareProfessional ;
+               rdfs:comment "Links a clinical process to the healthcare professional(s) who perform it." ;
+               rdfs:label "is performed by" .
+
+:performs rdf:type owl:ObjectProperty ;
+          rdfs:domain :HealthcareProfessional ;
+          rdfs:range :ClinicalProcess ;
+          rdfs:comment "Indicates which clinical processes a healthcare professional performs." ;
+          rdfs:label "performs" .
+
+:hasPrimarySurgeon rdf:type owl:ObjectProperty , owl:FunctionalProperty ;
+                   rdfs:subPropertyOf :isPerformedBy ;
+                   owl:inverseOf :isPrimarySurgeonFor ;
+                   rdfs:domain :SurgicalProcedure ;
+                   rdfs:range :Surgeon ;
+                   rdfs:comment "Identifies the primary surgeon for a surgical procedure. Each surgery has exactly one primary surgeon." ;
+                   rdfs:label "has primary surgeon" .
+
+:isPrimarySurgeonFor rdf:type owl:ObjectProperty ;
+                     rdfs:domain :Surgeon ;
+                     rdfs:range :SurgicalProcedure ;
+                     rdfs:comment "Indicates which surgical procedures this surgeon is the primary surgeon for." ;
+                     rdfs:label "is primary surgeon for" .
+
+:hasAssistingSurgeon rdf:type owl:ObjectProperty ;
+                     rdfs:subPropertyOf :isPerformedBy ;
+                     owl:inverseOf :assistsInSurgery ;
+                     rdfs:domain :SurgicalProcedure ;
+                     rdfs:range :Surgeon ;
+                     rdfs:comment "Identifies assisting surgeons in a surgical procedure." ;
+                     rdfs:label "has assisting surgeon" .
+
+:assistsInSurgery rdf:type owl:ObjectProperty ;
+                  rdfs:domain :Surgeon ;
+                  rdfs:range :SurgicalProcedure ;
+                  rdfs:comment "Indicates which surgeries this surgeon assists in." ;
+                  rdfs:label "assists in surgery" .
+
+:participatesIn rdf:type owl:ObjectProperty ;
+                owl:inverseOf :hasParticipant ;
+                rdfs:domain :Patient ;
+                rdfs:range :ClinicalProcess ;
+                rdfs:comment "Links a patient to clinical processes they participate in." ;
+                rdfs:label "participates in" .
+
+:hasParticipant rdf:type owl:ObjectProperty ;
+                rdfs:domain :ClinicalProcess ;
+                rdfs:range :Patient ;
+                rdfs:comment "Links a clinical process to the patient participant(s)." ;
+                rdfs:label "has participant" .
+
+###  Anatomical Properties
+:isPartOf rdf:type owl:ObjectProperty , owl:TransitiveProperty ;
+          owl:inverseOf :hasPart ;
+          rdfs:domain :AnatomicalStructure ;
+          rdfs:range :AnatomicalStructure ;
+          rdfs:comment "Represents the anatomical part-whole relationship. Transitive property." ;
+          rdfs:label "is part of" .
+
+:hasPart rdf:type owl:ObjectProperty , owl:TransitiveProperty ;
+         rdfs:domain :AnatomicalStructure ;
+         rdfs:range :AnatomicalStructure ;
+         rdfs:comment "Inverse of isPartOf - indicates parts of an anatomical structure." ;
+         rdfs:label "has part" .
+
+###  Treatment Properties
+:isIndicatedFor rdf:type owl:ObjectProperty ;
+                owl:inverseOf :treatedBy ;
+                rdfs:domain :TreatmentProcedure ;
+                rdfs:range :Condition ;
+                rdfs:comment "Links a treatment to the condition(s) it is designed to address." ;
+                rdfs:label "is indicated for" .
+
+:treatedBy rdf:type owl:ObjectProperty ;
+           rdfs:domain :Condition ;
+           rdfs:range :TreatmentProcedure ;
+           rdfs:comment "Links a condition to the treatment procedure(s) used to address it." ;
+           rdfs:label "treated by" .
+
+###  Device Properties
+:usesDevice rdf:type owl:ObjectProperty ;
+            owl:inverseOf :isUsedIn ;
+            rdfs:domain :ClinicalProcess ;
+            rdfs:range :MedicalDevice ;
+            rdfs:comment "Links a clinical process to medical devices used." ;
+            rdfs:label "uses device" .
+
+:isUsedIn rdf:type owl:ObjectProperty ;
+          rdfs:domain :MedicalDevice ;
+          rdfs:range :ClinicalProcess ;
+          rdfs:comment "Indicates which clinical processes use this medical device." ;
+          rdfs:label "is used in" .
+
+:requiresDevice rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf :usesDevice ;
+                rdfs:domain :SurgicalProcedure ;
+                rdfs:range :MedicalDevice ;
+                rdfs:comment "Indicates mandatory medical devices for a surgical procedure." ;
+                rdfs:label "requires device" .
+
+###  Laterality Properties
+:hasLaterality rdf:type owl:ObjectProperty , owl:FunctionalProperty ;
+               rdfs:domain [ rdf:type owl:Class ;
+                            owl:unionOf ( :AnatomicalStructure :Condition :DiagnosticProcedure ) ] ;
+               rdfs:range :Laterality ;
+               rdfs:comment "Indicates the side affected (left, right, or bilateral). Functional property ensures only one laterality per entity." ;
+               rdfs:label "has laterality" .
+
+###  Outcome and Follow-up Properties
+:hasOutcome rdf:type owl:ObjectProperty ;
+            owl:inverseOf :isOutcomeOf ;
+            rdfs:domain :ClinicalProcess ;
+            rdfs:range :ProcedureOutcome ;
+            rdfs:comment "Links a clinical process to its outcome." ;
+            rdfs:label "has outcome" .
+
+:isOutcomeOf rdf:type owl:ObjectProperty ;
+             rdfs:domain :ProcedureOutcome ;
+             rdfs:range :ClinicalProcess ;
+             rdfs:comment "Indicates which clinical process this outcome belongs to." ;
+             rdfs:label "is outcome of" .
+
+:hasComplication rdf:type owl:ObjectProperty ;
+                 owl:inverseOf :isComplicationOf ;
+                 rdfs:domain :ClinicalProcess ;
+                 rdfs:range :Complication ;
+                 rdfs:comment "Links a clinical process to any complications that occurred." ;
+                 rdfs:label "has complication" .
+
+:isComplicationOf rdf:type owl:ObjectProperty ;
+                  rdfs:domain :Complication ;
+                  rdfs:range :ClinicalProcess ;
+                  rdfs:comment "Indicates which clinical process this complication occurred during." ;
+                  rdfs:label "is complication of" .
+
+:hasFollowUp rdf:type owl:ObjectProperty ;
+             owl:inverseOf :isFollowUpFor ;
+             rdfs:domain :ClinicalProcess ;
+             rdfs:range :FollowUpAppointment ;
+             rdfs:comment "Links a clinical process to scheduled follow-up appointments." ;
+             rdfs:label "has follow-up" .
+
+:isFollowUpFor rdf:type owl:ObjectProperty ;
+               rdfs:domain :FollowUpAppointment ;
+               rdfs:range :ClinicalProcess ;
+               rdfs:comment "Indicates which clinical process this is a follow-up for." ;
+               rdfs:label "is follow-up for" .
+
+###  Report Properties
+:hasReport rdf:type owl:ObjectProperty ;
+           owl:inverseOf :isReportFor ;
+           rdfs:domain :ClinicalProcess ;
+           rdfs:range :MedicalReport ;
+           rdfs:comment "Links a clinical process to associated medical reports." ;
+           rdfs:label "has report" .
+
+:isReportFor rdf:type owl:ObjectProperty ;
+             rdfs:domain :MedicalReport ;
+             rdfs:range :ClinicalProcess ;
+             rdfs:comment "Indicates which clinical process this report documents." ;
+             rdfs:label "is report for" .
+
+#################################################################
+#    Data Properties
+#################################################################
+
+###  Patient Demographics
+:hasMedicalRecordNumber rdf:type owl:DatatypeProperty , owl:FunctionalProperty ;
+                        rdfs:domain :Patient ;
+                        rdfs:range xsd:string ;
+                        rdfs:comment "Unique medical record number. Enforced by owl:hasKey on Patient class." ;
+                        rdfs:label "has medical record number" .
+
+:hasDateOfBirth rdf:type owl:DatatypeProperty , owl:FunctionalProperty ;
+                rdfs:domain :Patient ;
+                rdfs:range xsd:date ;
+                rdfs:comment "Patient's date of birth. Each patient has exactly one birth date." ;
+                rdfs:label "has date of birth" .
+
+:hasGender rdf:type owl:DatatypeProperty , owl:FunctionalProperty ;
+           rdfs:domain :Patient ;
+           rdfs:range [ rdf:type rdfs:Datatype ;
+                       owl:oneOf ( "Male"^^xsd:string "Female"^^xsd:string "Other"^^xsd:string "Unknown"^^xsd:string ) ] ;
+           rdfs:comment "Patient's gender." ;
+           rdfs:label "has gender" .
+
+:hasWeightKg rdf:type owl:DatatypeProperty ;
+             rdfs:domain :Patient ;
+             rdfs:range [ rdf:type rdfs:Datatype ;
+                         owl:onDatatype xsd:decimal ;
+                         owl:withRestrictions ( [ xsd:minInclusive "0.5"^^xsd:decimal ]
+                                                [ xsd:maxInclusive "300.0"^^xsd:decimal ] ) ] ;
+             rdfs:comment "Patient's weight in kilograms." ;
+             rdfs:label "has weight (kg)" .
+
+:hasHeightCm rdf:type owl:DatatypeProperty ;
+             rdfs:domain :Patient ;
+             rdfs:range [ rdf:type rdfs:Datatype ;
+                         owl:onDatatype xsd:decimal ;
+                         owl:withRestrictions ( [ xsd:minInclusive "30.0"^^xsd:decimal ]
+                                                [ xsd:maxInclusive "250.0"^^xsd:decimal ] ) ] ;
+             rdfs:comment "Patient's height in centimeters." ;
+             rdfs:label "has height (cm)" .
+
+:hasContactPhone rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :Patient ;
+                 rdfs:range xsd:string ;
+                 rdfs:comment "Patient's contact phone number." ;
+                 rdfs:label "has contact phone" .
+
+:hasContactEmail rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :Patient ;
+                 rdfs:range xsd:string ;
+                 rdfs:comment "Patient's contact email address." ;
+                 rdfs:label "has contact email" .
+
+###  Allergy Properties
+:hasAllergySeverity rdf:type owl:DatatypeProperty , owl:FunctionalProperty ;
+                    rdfs:domain :Allergy ;
+                    rdfs:range [ rdf:type rdfs:Datatype ;
+                                owl:oneOf ( "Mild"^^xsd:string "Moderate"^^xsd:string "Severe"^^xsd:string "Life-threatening"^^xsd:string ) ] ;
+                    rdfs:comment "Severity level of the allergy (enumerated values)." ;
+                    rdfs:label "has allergy severity" .
+
+:allergyReaction rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :Allergy ;
+                 rdfs:range xsd:string ;
+                 rdfs:comment "Description of the allergic reaction." ;
+                 rdfs:label "allergy reaction" .
+
+:allergyFirstObservedDate rdf:type owl:DatatypeProperty ;
+                          rdfs:domain :Allergy ;
+                          rdfs:range xsd:date ;
+                          rdfs:comment "Date when allergy was first observed." ;
+                          rdfs:label "allergy first observed date" .
+
+###  Prescription Properties
+:prescriptionDate rdf:type owl:DatatypeProperty , owl:FunctionalProperty ;
+                  rdfs:domain :MedicationPrescription ;
+                  rdfs:range xsd:dateTime ;
+                  rdfs:comment "Date and time when the medication was prescribed." ;
+                  rdfs:label "prescription date" .
+
+:medicationDosage rdf:type owl:DatatypeProperty ;
+                  rdfs:domain :MedicationPrescription ;
+                  rdfs:range xsd:string ;
+                  rdfs:comment "Dosage amount and unit (e.g., '500mg')." ;
+                  rdfs:label "medication dosage" .
+
+:medicationFrequency rdf:type owl:DatatypeProperty ;
+                     rdfs:domain :MedicationPrescription ;
+                     rdfs:range xsd:string ;
+                     rdfs:comment "Frequency of medication administration (e.g., 'Three times daily')." ;
+                     rdfs:label "medication frequency" .
+
+:medicationDurationDays rdf:type owl:DatatypeProperty ;
+                        rdfs:domain :MedicationPrescription ;
+                        rdfs:range xsd:integer ;
+                        rdfs:comment "Duration of medication course in days." ;
+                        rdfs:label "medication duration (days)" .
+
+:routeOfAdministration rdf:type owl:DatatypeProperty ;
+                       rdfs:domain :MedicationPrescription ;
+                       rdfs:range [ rdf:type rdfs:Datatype ;
+                                   owl:oneOf ( "Oral"^^xsd:string "Intravenous"^^xsd:string "Intramuscular"^^xsd:string 
+                                              "Subcutaneous"^^xsd:string "Topical"^^xsd:string "Otic"^^xsd:string "Other"^^xsd:string ) ] ;
+                       rdfs:comment "Route of medication administration." ;
+                       rdfs:label "route of administration" .
+
+###  Medication Properties
+:activeIngredient rdf:type owl:DatatypeProperty ;
+                  rdfs:domain :Medication ;
+                  rdfs:range xsd:string ;
+                  rdfs:comment "Primary active pharmaceutical ingredient." ;
+                  rdfs:label "active ingredient" .
+
+:brandName rdf:type owl:DatatypeProperty ;
+           rdfs:domain :Medication ;
+           rdfs:range xsd:string ;
+           rdfs:comment "Brand/trade name of the medication." ;
+           rdfs:label "brand name" .
+
+:genericName rdf:type owl:DatatypeProperty ;
+             rdfs:domain :Medication ;
+             rdfs:range xsd:string ;
+             rdfs:comment "Generic/scientific name of the medication." ;
+             rdfs:label "generic name" .
+
+###  Temporal Properties for Conditions
+:diagnosisDate rdf:type owl:DatatypeProperty ;
+               rdfs:domain :Condition ;
+               rdfs:range xsd:date ;
+               rdfs:comment "Date when the condition was diagnosed." ;
+               rdfs:label "diagnosis date" .
+
+:onsetDate rdf:type owl:DatatypeProperty ;
+           rdfs:domain :Condition ;
+           rdfs:range xsd:date ;
+           rdfs:comment "Date when the condition symptoms first appeared." ;
+           rdfs:label "onset date" .
+
+:resolutionDate rdf:type owl:DatatypeProperty ;
+                rdfs:domain :Condition ;
+                rdfs:range xsd:date ;
+                rdfs:comment "Date when the condition was resolved (if applicable)." ;
+                rdfs:label "resolution date" .
+
+###  Clinical Process Temporal Properties
+:procedureStartDate rdf:type owl:DatatypeProperty , owl:FunctionalProperty ;
+                    rdfs:domain :ClinicalProcess ;
+                    rdfs:range xsd:dateTime ;
+                    rdfs:comment "Start date and time of the clinical procedure." ;
+                    rdfs:label "procedure start date" .
+
+:procedureEndDate rdf:type owl:DatatypeProperty , owl:FunctionalProperty ;
+                  rdfs:domain :ClinicalProcess ;
+                  rdfs:range xsd:dateTime ;
+                  rdfs:comment "End date and time of the clinical procedure." ;
+                  rdfs:label "procedure end date" .
+
+###  Audiometry Properties - Air Conduction
+:airConduction_250Hz rdf:type owl:DatatypeProperty ;
+                     rdfs:domain :AudiometryAssessment ;
+                     rdfs:range xsd:integer ;
+                     rdfs:comment "Air conduction threshold at 250Hz in dB HL." ;
+                     rdfs:label "air conduction 250Hz" .
+
+:airConduction_500Hz rdf:type owl:DatatypeProperty ;
+                     rdfs:domain :AudiometryAssessment ;
+                     rdfs:range xsd:integer ;
+                     rdfs:comment "Air conduction threshold at 500Hz in dB HL." ;
+                     rdfs:label "air conduction 500Hz" .
+
+:airConduction_1000Hz rdf:type owl:DatatypeProperty ;
+                      rdfs:domain :AudiometryAssessment ;
+                      rdfs:range xsd:integer ;
+                      rdfs:comment "Air conduction threshold at 1000Hz in dB HL." ;
+                      rdfs:label "air conduction 1000Hz" .
+
+:airConduction_2000Hz rdf:type owl:DatatypeProperty ;
+                      rdfs:domain :AudiometryAssessment ;
+                      rdfs:range xsd:integer ;
+                      rdfs:comment "Air conduction threshold at 2000Hz in dB HL." ;
+                      rdfs:label "air conduction 2000Hz" .
+
+:airConduction_4000Hz rdf:type owl:DatatypeProperty ;
+                      rdfs:domain :AudiometryAssessment ;
+                      rdfs:range xsd:integer ;
+                      rdfs:comment "Air conduction threshold at 4000Hz in dB HL." ;
+                      rdfs:label "air conduction 4000Hz" .
+
+:airConduction_8000Hz rdf:type owl:DatatypeProperty ;
+                      rdfs:domain :AudiometryAssessment ;
+                      rdfs:range xsd:integer ;
+                      rdfs:comment "Air conduction threshold at 8000Hz in dB HL." ;
+                      rdfs:label "air conduction 8000Hz" .
+
+###  Audiometry Properties - Bone Conduction
+:boneConduction_250Hz rdf:type owl:DatatypeProperty ;
+                      rdfs:domain :AudiometryAssessment ;
+                      rdfs:range xsd:integer ;
+                      rdfs:comment "Bone conduction threshold at 250Hz in dB HL." ;
+                      rdfs:label "bone conduction 250Hz" .
+
+:boneConduction_500Hz rdf:type owl:DatatypeProperty ;
+                      rdfs:domain :AudiometryAssessment ;
+                      rdfs:range xsd:integer ;
+                      rdfs:comment "Bone conduction threshold at 500Hz in dB HL." ;
+                      rdfs:label "bone conduction 500Hz" .
+
+:boneConduction_1000Hz rdf:type owl:DatatypeProperty ;
+                       rdfs:domain :AudiometryAssessment ;
+                       rdfs:range xsd:integer ;
+                       rdfs:comment "Bone conduction threshold at 1000Hz in dB HL." ;
+                       rdfs:label "bone conduction 1000Hz" .
+
+:boneConduction_2000Hz rdf:type owl:DatatypeProperty ;
+                       rdfs:domain :AudiometryAssessment ;
+                       rdfs:range xsd:integer ;
+                       rdfs:comment "Bone conduction threshold at 2000Hz in dB HL." ;
+                       rdfs:label "bone conduction 2000Hz" .
+
+:boneConduction_4000Hz rdf:type owl:DatatypeProperty ;
+                       rdfs:domain :AudiometryAssessment ;
+                       rdfs:range xsd:integer ;
+                       rdfs:comment "Bone conduction threshold at 4000Hz in dB HL." ;
+                       rdfs:label "bone conduction 4000Hz" .
+
+:boneConduction_8000Hz rdf:type owl:DatatypeProperty ;
+                       rdfs:domain :AudiometryAssessment ;
+                       rdfs:range xsd:integer ;
+                       rdfs:comment "Bone conduction threshold at 8000Hz in dB HL." ;
+                       rdfs:label "bone conduction 8000Hz" .
+
+###  Other Audiometry Properties
+:speechDiscriminationScore rdf:type owl:DatatypeProperty ;
+                           rdfs:domain :AudiometryAssessment ;
+                           rdfs:range [ rdf:type rdfs:Datatype ;
+                                       owl:onDatatype xsd:decimal ;
+                                       owl:withRestrictions ( [ xsd:minInclusive "0.0"^^xsd:decimal ]
+                                                             [ xsd:maxInclusive "100.0"^^xsd:decimal ] ) ] ;
+                           rdfs:comment "Speech discrimination score as a percentage (0-100%)." ;
+                           rdfs:label "speech discrimination score" .
+
+###  Medical Device Properties
+:deviceSerialNumber rdf:type owl:DatatypeProperty , owl:FunctionalProperty ;
+                    rdfs:domain :MedicalDevice ;
+                    rdfs:range xsd:string ;
+                    rdfs:comment "Unique serial number for a medical device." ;
+                    rdfs:label "device serial number" .
+
+:deviceManufacturer rdf:type owl:DatatypeProperty ;
+                    rdfs:domain :MedicalDevice ;
+                    rdfs:range xsd:string ;
+                    rdfs:comment "Manufacturer of the medical device." ;
+                    rdfs:label "device manufacturer" .
+
+:deviceModel rdf:type owl:DatatypeProperty ;
+             rdfs:domain :MedicalDevice ;
+             rdfs:range xsd:string ;
+             rdfs:comment "Model designation of the medical device." ;
+             rdfs:label "device model" .
+
+###  Report Properties
+:reportContent rdf:type owl:DatatypeProperty ;
+               rdfs:domain :MedicalReport ;
+               rdfs:range xsd:string ;
+               rdfs:comment "Text content of the medical report." ;
+               rdfs:label "report content" .
+
+:reportDate rdf:type owl:DatatypeProperty , owl:FunctionalProperty ;
+            rdfs:domain :MedicalReport ;
+            rdfs:range xsd:dateTime ;
+            rdfs:comment "Date and time when the report was created." ;
+            rdfs:label "report date" .
+
+###  General Notes Property
+:hasNotes rdf:type owl:DatatypeProperty ;
+          rdfs:domain :ClinicalEntity ;
+          rdfs:range xsd:string ;
+          rdfs:comment "General notes or comments applicable to clinical entities." ;
+          rdfs:label "has notes" .
+
+#################################################################
+#    Classes with Cardinality Restrictions
+#################################################################
+
+###  Root Class
+:ClinicalEntity rdf:type owl:Class ;
+                rdfs:comment "Root class for all clinical entities in the ontology." ;
+                rdfs:label "Clinical Entity" .
+
+###  Person Hierarchy
+:Person rdf:type owl:Class ;
+        rdfs:subClassOf :ClinicalEntity ;
+        rdfs:comment "Base class for all persons in the healthcare system." ;
+        rdfs:label "Person" .
+
+:Patient rdf:type owl:Class ;
+         rdfs:subClassOf :Person ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :hasMedicalRecordNumber ;
+                          owl:cardinality 1 ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :hasDateOfBirth ;
+                          owl:cardinality 1 ] ;
+         owl:hasKey ( :hasMedicalRecordNumber ) ;
+         rdfs:comment "A person receiving medical care. MRN must be unique." ;
+         rdfs:label "Patient" .
+
+:HealthcareProfessional rdf:type owl:Class ;
+                        rdfs:subClassOf :Person ;
+                        rdfs:comment "A person who provides healthcare services." ;
+                        rdfs:label "Healthcare Professional" .
+
+:Surgeon rdf:type owl:Class ;
+         rdfs:subClassOf :HealthcareProfessional ;
+         rdfs:comment "A healthcare professional who performs surgical procedures." ;
+         rdfs:label "Surgeon" .
+
+:Otologist rdf:type owl:Class ;
+           rdfs:subClassOf :Surgeon ;
+           rdfs:seeAlso <http://snomed.info/id/309343006> ;
+           rdfs:comment "A surgeon specializing in ear-related conditions and procedures." ;
+           rdfs:label "Otologist" .
+
+:Audiologist rdf:type owl:Class ;
+             rdfs:subClassOf :HealthcareProfessional ;
+             rdfs:seeAlso <http://snomed.info/id/309418004> ;
+             rdfs:comment "A healthcare professional specializing in hearing assessment and audiology." ;
+             rdfs:label "Audiologist" .
+
+###  Condition Hierarchy
+:Condition rdf:type owl:Class ;
+           rdfs:subClassOf :ClinicalEntity ,
+                          [ rdf:type owl:Restriction ;
+                            owl:onProperty :diagnosisDate ;
+                            owl:minCardinality 1 ] ;
+           rdfs:comment "A medical condition or disease state." ;
+           rdfs:label "Condition" .
+
+:OtologicCondition rdf:type owl:Class ;
+                   rdfs:subClassOf :Condition ;
+                   rdfs:comment "A medical condition affecting the ear or hearing system." ;
+                   rdfs:label "Otologic Condition" .
+
+:HearingLoss rdf:type owl:Class ;
+             rdfs:subClassOf :OtologicCondition ;
+             rdfs:seeAlso <http://snomed.info/id/15188001> ;
+             rdfs:comment "A condition characterized by reduced hearing ability." ;
+             rdfs:label "Hearing Loss" .
+
+:ConductiveHearingLoss rdf:type owl:Class ;
+                       rdfs:subClassOf :HearingLoss ;
+                       rdfs:comment "Hearing loss due to problems conducting sound through the outer or middle ear." ;
+                       rdfs:label "Conductive Hearing Loss" .
+
+:SensorineuralHearingLoss rdf:type owl:Class ;
+                          rdfs:subClassOf :HearingLoss ;
+                          rdfs:comment "Hearing loss due to problems in the inner ear or auditory nerve." ;
+                          rdfs:label "Sensorineural Hearing Loss" .
+
+:MixedHearingLoss rdf:type owl:Class ;
+                  rdfs:subClassOf :HearingLoss ;
+                  rdfs:comment "Hearing loss with both conductive and sensorineural components." ;
+                  rdfs:label "Mixed Hearing Loss" .
+
+:Cholesteatoma rdf:type owl:Class ;
+               rdfs:subClassOf :OtologicCondition ;
+               rdfs:seeAlso <http://snomed.info/id/60001007> ;
+               rdfs:comment "An abnormal skin growth in the middle ear behind the eardrum." ;
+               rdfs:label "Cholesteatoma" .
+
+:ChronicOtitisMedia rdf:type owl:Class ;
+                    rdfs:subClassOf :OtologicCondition ;
+                    rdfs:seeAlso <http://snomed.info/id/21186006> ;
+                    rdfs:comment "Chronic inflammation of the middle ear." ;
+                    rdfs:label "Chronic Otitis Media" .
+
+:Otosclerosis rdf:type owl:Class ;
+              rdfs:subClassOf :OtologicCondition ;
+              rdfs:seeAlso <http://snomed.info/id/17718002> ;
+              rdfs:comment "Abnormal bone growth in the middle ear affecting the stapes, causing hearing loss." ;
+              rdfs:label "Otosclerosis" .
+
+:Tinnitus rdf:type owl:Class ;
+          rdfs:subClassOf :OtologicCondition ;
+          rdfs:seeAlso <http://snomed.info/id/60862001> ;
+          rdfs:comment "Perception of ringing or noise in the ears." ;
+          rdfs:label "Tinnitus" .
+
+###  Clinical Process Hierarchy
+:ClinicalProcess rdf:type owl:Class ;
+                 rdfs:subClassOf :ClinicalEntity ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :procedureStartDate ;
+                                  owl:cardinality 1 ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :hasParticipant ;
+                                  owl:minCardinality 1 ] ;
+                 rdfs:comment "Any clinical procedure or process in the healthcare workflow." ;
+                 rdfs:label "Clinical Process" .
+
+:DiagnosticProcedure rdf:type owl:Class ;
+                     rdfs:subClassOf :ClinicalProcess ;
+                     rdfs:comment "A procedure performed to diagnose a medical condition." ;
+                     rdfs:label "Diagnostic Procedure" .
+
+:AudiometryAssessment rdf:type owl:Class ;
+                      rdfs:subClassOf :DiagnosticProcedure ,
+                                     [ rdf:type owl:Restriction ;
+                                       owl:onProperty :hasLaterality ;
+                                       owl:cardinality 1 ] ;
+                      rdfs:seeAlso <http://snomed.info/id/252465000> ;
+                      rdfs:comment "A hearing assessment procedure measuring auditory thresholds." ;
+                      rdfs:label "Audiometry Assessment" .
+
+:TympanometryAssessment rdf:type owl:Class ;
+                        rdfs:subClassOf :DiagnosticProcedure ;
+                        rdfs:seeAlso <http://snomed.info/id/53827007> ;
+                        rdfs:comment "A test measuring middle ear function and eardrum mobility." ;
+                        rdfs:label "Tympanometry Assessment" .
+
+:TreatmentProcedure rdf:type owl:Class ;
+                    rdfs:subClassOf :ClinicalProcess ;
+                    rdfs:comment "A procedure performed to treat a medical condition." ;
+                    rdfs:label "Treatment Procedure" .
+
+:SurgicalProcedure rdf:type owl:Class ;
+                   rdfs:subClassOf :TreatmentProcedure ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty :hasPrimarySurgeon ;
+                                    owl:cardinality 1 ] ;
+                   rdfs:comment "A surgical intervention procedure." ;
+                   rdfs:label "Surgical Procedure" .
+
+:Tympanomastoidectomy rdf:type owl:Class ;
+                      rdfs:subClassOf :SurgicalProcedure ;
+                      rdfs:seeAlso <http://snomed.info/id/302456006> ;
+                      rdfs:comment "A surgical procedure involving the middle ear and mastoid cavity." ;
+                      rdfs:label "Tympanomastoidectomy" .
+
+:Stapedectomy rdf:type owl:Class ;
+              rdfs:subClassOf :SurgicalProcedure ;
+              rdfs:seeAlso <http://snomed.info/id/44981006> ;
+              rdfs:comment "A surgical procedure to treat otosclerosis by replacing the stapes." ;
+              rdfs:label "Stapedectomy" .
+
+:Myringotomy rdf:type owl:Class ;
+             rdfs:subClassOf :SurgicalProcedure ;
+             rdfs:seeAlso <http://snomed.info/id/232191009> ;
+             rdfs:comment "Surgical incision of the eardrum to relieve pressure or drain fluid." ;
+             rdfs:label "Myringotomy" .
+
+:Consultation rdf:type owl:Class ;
+              rdfs:subClassOf :ClinicalProcess ;
+              rdfs:comment "A clinical consultation or examination appointment." ;
+              rdfs:label "Consultation" .
+
+:FollowUpAppointment rdf:type owl:Class ;
+                     rdfs:subClassOf :Consultation ;
+                     rdfs:comment "A scheduled appointment to monitor recovery or treatment progress." ;
+                     rdfs:label "Follow-up Appointment" .
+
+###  Medication and Prescription Classes
+:Medication rdf:type owl:Class ;
+            rdfs:subClassOf :ClinicalEntity ;
+            rdfs:comment "A pharmaceutical medication or drug." ;
+            rdfs:label "Medication" .
+
+:Antibiotic rdf:type owl:Class ;
+            rdfs:subClassOf :Medication ;
+            rdfs:comment "An antibiotic medication." ;
+            rdfs:label "Antibiotic" .
+
+:Analgesic rdf:type owl:Class ;
+           rdfs:subClassOf :Medication ;
+           rdfs:comment "A pain relief medication." ;
+           rdfs:label "Analgesic" .
+
+:AntiInflammatory rdf:type owl:Class ;
+                  rdfs:subClassOf :Medication ;
+                  rdfs:comment "An anti-inflammatory medication." ;
+                  rdfs:label "Anti-Inflammatory" .
+
+:MedicationPrescription rdf:type owl:Class ;
+                        rdfs:subClassOf :ClinicalEntity ,
+                                       [ rdf:type owl:Restriction ;
+                                         owl:onProperty :isPrescribedFor ;
+                                         owl:cardinality 1 ] ,
+                                       [ rdf:type owl:Restriction ;
+                                         owl:onProperty :hasPrescribedMedication ;
+                                         owl:cardinality 1 ] ,
+                                       [ rdf:type owl:Restriction ;
+                                         owl:onProperty :isPrescribedBy ;
+                                         owl:cardinality 1 ] ,
+                                       [ rdf:type owl:Restriction ;
+                                         owl:onProperty :prescriptionDate ;
+                                         owl:cardinality 1 ] ;
+                        rdfs:comment "A prescription for a medication, linking patient, medication, prescriber, and dosing details." ;
+                        rdfs:label "Medication Prescription" .
+
+:DrugClass rdf:type owl:Class ;
+           rdfs:subClassOf :ClinicalEntity ;
+           rdfs:comment "A pharmacological classification of medications." ;
+           rdfs:label "Drug Class" .
+
+###  Allergy Class
+:Allergy rdf:type owl:Class ;
+         rdfs:subClassOf :ClinicalEntity ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :hasAllergySeverity ;
+                          owl:cardinality 1 ] ;
+         rdfs:comment "An allergic reaction or hypersensitivity to a substance." ;
+         rdfs:label "Allergy" .
+
+###  Anatomical Structure Hierarchy
+:AnatomicalStructure rdf:type owl:Class ;
+                     rdfs:subClassOf :ClinicalEntity ;
+                     rdfs:comment "An anatomical structure or body part." ;
+                     rdfs:label "Anatomical Structure" .
+
+:TemporalBone rdf:type owl:Class ;
+              rdfs:subClassOf :AnatomicalStructure ;
+              rdfs:seeAlso <http://snomed.info/id/60911003> ;
+              rdfs:comment "The temporal bone of the skull, housing the ear structures." ;
+              rdfs:label "Temporal Bone" .
+
+:ExternalEar rdf:type owl:Class ;
+             rdfs:subClassOf :AnatomicalStructure ;
+             rdfs:seeAlso <http://snomed.info/id/117590005> ;
+             rdfs:comment "The external ear including the auricle and external auditory canal." ;
+             rdfs:label "External Ear" .
+
+:MiddleEar rdf:type owl:Class ;
+           rdfs:subClassOf :AnatomicalStructure ;
+           rdfs:seeAlso <http://snomed.info/id/25342003> ;
+           rdfs:comment "The middle ear cavity containing the ossicles and eardrum." ;
+           rdfs:label "Middle Ear" .
+
+:InnerEar rdf:type owl:Class ;
+          rdfs:subClassOf :AnatomicalStructure ;
+          rdfs:seeAlso <http://snomed.info/id/181187000> ;
+          rdfs:comment "The inner ear containing the cochlea and vestibular system." ;
+          rdfs:label "Inner Ear" .
+
+:Ossicle rdf:type owl:Class ;
+         rdfs:subClassOf :AnatomicalStructure ;
+         rdfs:comment "One of the three small bones in the middle ear." ;
+         rdfs:label "Ossicle" .
+
+:Malleus rdf:type owl:Class ;
+         rdfs:subClassOf :Ossicle ;
+         rdfs:seeAlso <http://snomed.info/id/34080009> ;
+         rdfs:comment "The hammer-shaped ossicle attached to the eardrum." ;
+         rdfs:label "Malleus" .
+
+:Incus rdf:type owl:Class ;
+       rdfs:subClassOf :Ossicle ;
+       rdfs:seeAlso <http://snomed.info/id/421793000> ;
+       rdfs:comment "The anvil-shaped ossicle between the malleus and stapes." ;
+       rdfs:label "Incus" .
+
+:Stapes rdf:type owl:Class ;
+        rdfs:subClassOf :Ossicle ;
+        rdfs:seeAlso <http://snomed.info/id/22718006> ;
+        rdfs:comment "The stirrup-shaped ossicle, the smallest bone in the human body." ;
+        rdfs:label "Stapes" .
+
+:Cochlea rdf:type owl:Class ;
+         rdfs:subClassOf :AnatomicalStructure ;
+         rdfs:seeAlso <http://snomed.info/id/80169004> ;
+         rdfs:comment "The spiral-shaped organ of hearing in the inner ear." ;
+         rdfs:label "Cochlea" .
+
+:TympanicMembrane rdf:type owl:Class ;
+                  rdfs:subClassOf :AnatomicalStructure ;
+                  rdfs:seeAlso <http://snomed.info/id/42859004> ;
+                  rdfs:comment "The eardrum, separating the outer ear from the middle ear." ;
+                  rdfs:label "Tympanic Membrane" .
+
+:EustachianTube rdf:type owl:Class ;
+                rdfs:subClassOf :AnatomicalStructure ;
+                rdfs:seeAlso <http://snomed.info/id/59820001> ;
+                rdfs:comment "The tube connecting the middle ear to the nasopharynx." ;
+                rdfs:label "Eustachian Tube" .
+
+###  Medical Device Hierarchy
+:MedicalDevice rdf:type owl:Class ;
+               rdfs:subClassOf :ClinicalEntity ;
+               rdfs:comment "A medical device used in clinical procedures or patient care." ;
+               rdfs:label "Medical Device" .
+
+:HearingAid rdf:type owl:Class ;
+            rdfs:subClassOf :MedicalDevice ;
+            rdfs:seeAlso <http://snomed.info/id/6012004> ;
+            rdfs:comment "An electronic device to amplify sound for hearing-impaired patients." ;
+            rdfs:label "Hearing Aid" .
+
+:CochlearImplant rdf:type owl:Class ;
+                 rdfs:subClassOf :MedicalDevice ;
+                 rdfs:seeAlso <http://snomed.info/id/43252007> ;
+                 rdfs:comment "An electronic device surgically implanted to provide hearing sensation." ;
+                 rdfs:label "Cochlear Implant" .
+
+:Prosthesis rdf:type owl:Class ;
+            rdfs:subClassOf :MedicalDevice ;
+            rdfs:comment "An artificial device used to replace or support a body part." ;
+            rdfs:label "Prosthesis" .
+
+:OssicularProsthesis rdf:type owl:Class ;
+                     rdfs:subClassOf :Prosthesis ;
+                     rdfs:comment "An artificial replacement for damaged or missing ossicles." ;
+                     rdfs:label "Ossicular Prosthesis" .
+
+:VentilationTube rdf:type owl:Class ;
+                 rdfs:subClassOf :MedicalDevice ;
+                 rdfs:seeAlso <http://snomed.info/id/19923001> ;
+                 rdfs:comment "A small tube inserted through the eardrum to ventilate the middle ear." ;
+                 rdfs:label "Ventilation Tube" .
+
+###  Laterality Class
+:Laterality rdf:type owl:Class ;
+            owl:equivalentClass [ rdf:type owl:Class ;
+                                 owl:oneOf ( :Left :Right :Bilateral ) ] ;
+            rdfs:comment "Enumeration of anatomical sides: Left, Right, or Bilateral." ;
+            rdfs:label "Laterality" .
+
+###  Safety and Error Classes
+:ContraindicatedPrescription rdf:type owl:Class ;
+                             rdfs:subClassOf :MedicationPrescription ;
+                             rdfs:comment "A medication prescription that is contraindicated due to patient allergies or other safety concerns." ;
+                             rdfs:label "Contraindicated Prescription" .
+
+:SafePrescription rdf:type owl:Class ;
+                  rdfs:subClassOf :MedicationPrescription ;
+                  owl:disjointWith :ContraindicatedPrescription ;
+                  rdfs:comment "A medication prescription that is safe for the patient based on known allergies and interactions." ;
+                  rdfs:label "Safe Prescription" .
+
+:TemporalInconsistency rdf:type owl:Class ;
+                       rdfs:subClassOf owl:Thing ;
+                       rdfs:comment "Identifies temporal inconsistencies in the clinical timeline." ;
+                       rdfs:label "Temporal Inconsistency" .
+
+###  Allergy Severity Subclasses (for reasoning)
+:MildAllergy rdf:type owl:Class ;
+             rdfs:subClassOf :Allergy ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :hasAllergySeverity ;
+                              owl:hasValue "Mild"^^xsd:string ] ;
+             rdfs:label "Mild Allergy" .
+
+:SevereAllergy rdf:type owl:Class ;
+               rdfs:subClassOf :Allergy ,
+                              [ rdf:type owl:Restriction ;
+                                owl:onProperty :hasAllergySeverity ;
+                                owl:hasValue "Severe"^^xsd:string ] ;
+               rdfs:label "Severe Allergy" .
+
+:LifeThreateningAllergy rdf:type owl:Class ;
+                        rdfs:subClassOf :Allergy ,
+                                       [ rdf:type owl:Restriction ;
+                                         owl:onProperty :hasAllergySeverity ;
+                                         owl:hasValue "Life-threatening"^^xsd:string ] ;
+                        rdfs:label "Life-Threatening Allergy" .
+
+###  Outcome Classes
+:ProcedureOutcome rdf:type owl:Class ;
+                  rdfs:subClassOf :ClinicalEntity ;
+                  rdfs:comment "The outcome or result of a clinical procedure." ;
+                  rdfs:label "Procedure Outcome" .
+
+:SuccessfulOutcome rdf:type owl:Class ;
+                   rdfs:subClassOf :ProcedureOutcome ;
+                   rdfs:comment "A positive or successful procedure outcome." ;
+                   rdfs:label "Successful Outcome" .
+
+:UnsuccessfulOutcome rdf:type owl:Class ;
+                     rdfs:subClassOf :ProcedureOutcome ;
+                     rdfs:comment "A negative or unsuccessful procedure outcome." ;
+                     rdfs:label "Unsuccessful Outcome" .
+
+:PartiallySuccessfulOutcome rdf:type owl:Class ;
+                            rdfs:subClassOf :ProcedureOutcome ;
+                            rdfs:comment "An outcome with partial success or mixed results." ;
+                            rdfs:label "Partially Successful Outcome" .
+
+###  Complication Classes
+:Complication rdf:type owl:Class ;
+              rdfs:subClassOf :ClinicalEntity ;
+              rdfs:comment "An unexpected problem or adverse event during or after a procedure." ;
+              rdfs:label "Complication" .
+
+:Infection rdf:type owl:Class ;
+           rdfs:subClassOf :Complication ;
+           rdfs:comment "An infection occurring as a complication." ;
+           rdfs:label "Infection" .
+
+:Bleeding rdf:type owl:Class ;
+          rdfs:subClassOf :Complication ;
+          rdfs:comment "Excessive bleeding as a complication." ;
+          rdfs:label "Bleeding" .
+
+:FacialNerveInjury rdf:type owl:Class ;
+                   rdfs:subClassOf :Complication ;
+                   rdfs:comment "Injury to the facial nerve during or after surgery." ;
+                   rdfs:label "Facial Nerve Injury" .
+
+:HearingLossComplication rdf:type owl:Class ;
+                         rdfs:subClassOf :Complication ;
+                         rdfs:comment "Hearing loss occurring as a complication of a procedure." ;
+                         rdfs:label "Hearing Loss Complication" .
+
+###  Report Class
+:MedicalReport rdf:type owl:Class ;
+               rdfs:subClassOf :ClinicalEntity ;
+               rdfs:comment "A medical report documenting findings, results, or recommendations." ;
+               rdfs:label "Medical Report" .
+
+#################################################################
+#    Defined Classes (Inference Rules)
+#################################################################
+
+###  Surgical Patient - Inferred from participation in surgery
+:SurgicalPatient rdf:type owl:Class ;
+                 owl:equivalentClass [ rdf:type owl:Class ;
+                                      owl:intersectionOf ( :Patient
+                                                          [ rdf:type owl:Restriction ;
+                                                            owl:onProperty :participatesIn ;
+                                                            owl:someValuesFrom :SurgicalProcedure ] ) ] ;
+                 rdfs:comment "A patient who has undergone or will undergo surgical procedures (inferred)." ;
+                 rdfs:label "Surgical Patient" .
+
+###  Patient with Hearing Loss - Inferred from diagnosis
+:PatientWithHearingLoss rdf:type owl:Class ;
+                        owl:equivalentClass [ rdf:type owl:Class ;
+                                             owl:intersectionOf ( :Patient
+                                                                 [ rdf:type owl:Restriction ;
+                                                                   owl:onProperty :hasDiagnosis ;
+                                                                   owl:someValuesFrom :HearingLoss ] ) ] ;
+                        rdfs:comment "A patient diagnosed with any type of hearing loss (inferred)." ;
+                        rdfs:label "Patient with Hearing Loss" .
+
+###  Allergic Patient - Inferred from having allergies
+:AllergicPatient rdf:type owl:Class ;
+                 owl:equivalentClass [ rdf:type owl:Class ;
+                                      owl:intersectionOf ( :Patient
+                                                          [ rdf:type owl:Restriction ;
+                                                            owl:onProperty :hasAllergy ;
+                                                            owl:someValuesFrom :Allergy ] ) ] ;
+                 rdfs:comment "A patient with documented allergies (inferred)." ;
+                 rdfs:label "Allergic Patient" .
+
+###  Patient with High-Risk Allergy - Inferred from severe allergies
+:HighRiskAllergyPatient rdf:type owl:Class ;
+                        owl:equivalentClass [ rdf:type owl:Class ;
+                                             owl:intersectionOf ( :Patient
+                                                                 [ rdf:type owl:Restriction ;
+                                                                   owl:onProperty :hasAllergy ;
+                                                                   owl:someValuesFrom :SevereAllergy ] ) ] ;
+                        rdfs:comment "A patient with severe or life-threatening allergies requiring special precautions (inferred)." ;
+                        rdfs:label "High-Risk Allergy Patient" .
+
+###  Patient Requiring Allergy Alert - Inferred from life-threatening allergies
+:AllergyAlertPatient rdf:type owl:Class ;
+                     owl:equivalentClass [ rdf:type owl:Class ;
+                                          owl:intersectionOf ( :Patient
+                                                              [ rdf:type owl:Restriction ;
+                                                                owl:onProperty :hasAllergy ;
+                                                                owl:someValuesFrom :LifeThreateningAllergy ] ) ] ;
+                     rdfs:comment "A patient with life-threatening allergies requiring immediate alerts (inferred)." ;
+                     rdfs:label "Allergy Alert Patient" .
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  Laterality Constants
+:Left rdf:type owl:NamedIndividual , :Laterality ;
+      rdfs:label "Left" .
+
+:Right rdf:type owl:NamedIndividual , :Laterality ;
+       rdfs:label "Right" .
+
+:Bilateral rdf:type owl:NamedIndividual , :Laterality ;
+           rdfs:label "Bilateral" .
+
+###  Drug Classes
+:PenicillinClass rdf:type owl:NamedIndividual , :DrugClass ;
+                 rdfs:label "Penicillin Class" ;
+                 rdfs:comment "Beta-lactam antibiotics containing a penicillin nucleus." .
+
+:BetaLactamClass rdf:type owl:NamedIndividual , :DrugClass ;
+                 rdfs:label "Beta-Lactam Class" ;
+                 rdfs:comment "Antibiotics containing a beta-lactam ring structure." .
+
+:LincosamideClass rdf:type owl:NamedIndividual , :DrugClass ;
+                  rdfs:label "Lincosamide Class" ;
+                  rdfs:comment "Antibiotics that inhibit bacterial protein synthesis." .
+
+:CephalosporinClass rdf:type owl:NamedIndividual , :DrugClass ;
+                    rdfs:label "Cephalosporin Class" ;
+                    rdfs:comment "Beta-lactam antibiotics related to penicillins." .
+
+:NSAIDClass rdf:type owl:NamedIndividual , :DrugClass ;
+            rdfs:label "NSAID Class" ;
+            rdfs:comment "Non-steroidal anti-inflammatory drugs." .
+
+:NeuromuscularBlockingAgentClass rdf:type owl:NamedIndividual , :DrugClass ;
+                                 rdfs:label "Neuromuscular Blocking Agent Class" ;
+                                 rdfs:comment "Medications that cause muscle relaxation." .
+
+###  Medications
+:Amoxicillin rdf:type owl:NamedIndividual , :Antibiotic ;
+             :belongsToDrugClass :PenicillinClass , :BetaLactamClass ;
+             :activeIngredient "Amoxicillin trihydrate" ;
+             :genericName "Amoxicillin" ;
+             rdfs:label "Amoxicillin" .
+
+:Clindamycin rdf:type owl:NamedIndividual , :Antibiotic ;
+             :belongsToDrugClass :LincosamideClass ;
+             :activeIngredient "Clindamycin" ;
+             :genericName "Clindamycin" ;
+             rdfs:label "Clindamycin" ;
+             rdfs:comment "Safe alternative for patients with penicillin allergies." .
+
+:Ceftriaxone rdf:type owl:NamedIndividual , :Antibiotic ;
+             :belongsToDrugClass :CephalosporinClass , :BetaLactamClass ;
+             :activeIngredient "Ceftriaxone sodium" ;
+             :genericName "Ceftriaxone" ;
+             rdfs:label "Ceftriaxone" ;
+             rdfs:comment "Caution: May cross-react with penicillin allergies." .
+
+:Ibuprofen rdf:type owl:NamedIndividual , :Analgesic , :AntiInflammatory ;
+           :belongsToDrugClass :NSAIDClass ;
+           :activeIngredient "Ibuprofen" ;
+           :genericName "Ibuprofen" ;
+           rdfs:label "Ibuprofen" .
+
+:Atracurium rdf:type owl:NamedIndividual , :Medication ;
+            :belongsToDrugClass :NeuromuscularBlockingAgentClass ;
+            :activeIngredient "Atracurium besylate" ;
+            :genericName "Atracurium" ;
+            rdfs:label "Atracurium" ;
+            rdfs:comment "Neuromuscular blocking agent used in anesthesia." .
+
+###  Medication Interactions
+:Clindamycin :interactsWith :Atracurium .
+
+###  Healthcare Professionals
+:Dr_Smith rdf:type owl:NamedIndividual , :Otologist ;
+          rdfs:label "Dr. Sarah Smith" ;
+          :hasNotes "Board-certified otologist with 15 years experience." .
+
+:Dr_Johnson rdf:type owl:NamedIndividual , :Otologist ;
+            rdfs:label "Dr. Robert Johnson" ;
+            :hasNotes "Specialist in complex middle ear reconstruction." .
+
+:Audiologist_Jones rdf:type owl:NamedIndividual , :Audiologist ;
+                   rdfs:label "Dr. Michael Jones" ;
+                   :hasNotes "Clinical audiologist specializing in diagnostic audiology." .
+
+###  Patient John Doe - Complete Profile
+:Patient_JD rdf:type owl:NamedIndividual , :Patient ;
+            :hasMedicalRecordNumber "JD123456" ;
+            :hasDateOfBirth "1980-05-12"^^xsd:date ;
+            :hasGender "Male"^^xsd:string ;
+            :hasWeightKg "78.5"^^xsd:decimal ;
+            :hasHeightCm "178.0"^^xsd:decimal ;
+            :hasContactPhone "+39-02-555-0123" ;
+            :hasContactEmail "john.doe@example.com" ;
+            :hasDiagnosis :Condition_Cholesteatoma_L ;
+            :hasAllergy :Allergy_Penicillin_JD ;
+            :participatesIn :Consultation_JD_Initial , :Audiometry_JD_Left_001 , :Surgery_Tymp_001 ;
+            rdfs:label "John Doe" .
+
+###  Patient's Allergy (Life-threatening)
+:Allergy_Penicillin_JD rdf:type owl:NamedIndividual , :Allergy , :LifeThreateningAllergy ;
+                       :isAllergyOf :Patient_JD ;
+                       :hasAllergySeverity "Life-threatening"^^xsd:string ;
+                       :allergyReaction "Anaphylaxis with difficulty breathing and hives" ;
+                       :allergyFirstObservedDate "2015-03-15"^^xsd:date ;
+                       :contraindicatesDrugClass :PenicillinClass ;
+                       :contraindicatesMedication :Amoxicillin ;
+                       :contraindicatesMedication :Ceftriaxone ;
+                       rdfs:label "Penicillin Allergy - Patient JD" ;
+                       :hasNotes "Documented anaphylactic reaction in 2015. Patient carries EpiPen." .
+
+###  Patient's Condition
+:Condition_Cholesteatoma_L rdf:type owl:NamedIndividual , :Cholesteatoma ;
+                           :isDiagnosisOf :Patient_JD ;
+                           :affectsStructure :Anatomy_LeftIncus , :Anatomy_MiddleEar_L ;
+                           :hasLaterality :Left ;
+                           :onsetDate "2025-06-01"^^xsd:date ;
+                           :diagnosisDate "2025-12-15"^^xsd:date ;
+                           :treatedBy :Surgery_Tymp_001 ;
+                           rdfs:label "Left Cholesteatoma - Patient JD" ;
+                           :hasNotes "Progressive hearing loss and intermittent otorrhea for 6 months." .
+
+###  Initial Consultation
+:Consultation_JD_Initial rdf:type owl:NamedIndividual , :Consultation ;
+                         :hasParticipant :Patient_JD ;
+                         :isPerformedBy :Dr_Smith ;
+                         :procedureStartDate "2025-12-10T09:00:00"^^xsd:dateTime ;
+                         :procedureEndDate "2025-12-10T09:45:00"^^xsd:dateTime ;
+                         :hasReport :Report_Consultation_JD ;
+                         :hasNotes "Initial consultation for hearing loss and ear pain. Otoscopic examination reveals cholesteatoma." ;
+                         rdfs:label "Initial Consultation - Patient JD" .
+
+###  Audiometry Assessment
+:Audiometry_JD_Left_001 rdf:type owl:NamedIndividual , :AudiometryAssessment ;
+                        :hasParticipant :Patient_JD ;
+                        :isPerformedBy :Audiologist_Jones ;
+                        :procedureStartDate "2025-12-20T10:00:00"^^xsd:dateTime ;
+                        :procedureEndDate "2025-12-20T10:30:00"^^xsd:dateTime ;
+                        :hasLaterality :Left ;
+                        :airConduction_250Hz "45"^^xsd:integer ;
+                        :airConduction_500Hz "50"^^xsd:integer ;
+                        :airConduction_1000Hz "55"^^xsd:integer ;
+                        :airConduction_2000Hz "60"^^xsd:integer ;
+                        :airConduction_4000Hz "65"^^xsd:integer ;
+                        :airConduction_8000Hz "70"^^xsd:integer ;
+                        :boneConduction_250Hz "15"^^xsd:integer ;
+                        :boneConduction_500Hz "20"^^xsd:integer ;
+                        :boneConduction_1000Hz "20"^^xsd:integer ;
+                        :boneConduction_2000Hz "25"^^xsd:integer ;
+                        :boneConduction_4000Hz "30"^^xsd:integer ;
+                        :boneConduction_8000Hz "35"^^xsd:integer ;
+                        :speechDiscriminationScore "76.0"^^xsd:decimal ;
+                        :hasReport :Report_Audiometry_JD ;
+                        :hasNotes "Significant air-bone gap consistent with conductive hearing loss." ;
+                        rdfs:label "Left Ear Audiometry - Patient JD - Dec 2025" .
+
+###  Audiometry Report
+:Report_Audiometry_JD rdf:type owl:NamedIndividual , :MedicalReport ;
+                      :isReportFor :Audiometry_JD_Left_001 ;
+                      :reportDate "2025-12-20T11:00:00"^^xsd:dateTime ;
+                      :reportContent "Pure tone audiometry reveals moderate conductive hearing loss in the left ear with significant air-bone gaps across all frequencies (25-35 dB). Speech discrimination score of 76% at comfortable listening level. Bone conduction thresholds are within normal limits, confirming pure conductive component. Findings consistent with middle ear pathology. Clinical correlation with otoscopic findings recommended. Surgical intervention may be beneficial." ;
+                      rdfs:label "Audiometry Report - Patient JD" .
+
+###  Consultation Report
+:Report_Consultation_JD rdf:type owl:NamedIndividual , :MedicalReport ;
+                        :isReportFor :Consultation_JD_Initial ;
+                        :reportDate "2025-12-10T10:00:00"^^xsd:dateTime ;
+                        :reportContent "Patient presents with 6-month history of progressive left ear hearing loss and intermittent otorrhea. Otoscopic examination reveals attic retraction pocket with cholesteatoma. Audiometry shows conductive hearing loss. Patient has documented severe penicillin allergy. Recommended tympanomastoidectomy with preoperative allergy alert." ;
+                        rdfs:label "Consultation Report - Patient JD" .
+
+###  Medication Prescription (Safe - Clindamycin)
+:Prescription_Clindamycin_JD rdf:type owl:NamedIndividual , :MedicationPrescription , :SafePrescription ;
+                             :isPrescribedFor :Patient_JD ;
+                             :isPrescribedBy :Dr_Smith ;
+                             :hasPrescribedMedication :Clindamycin ;
+                             :prescriptionDate "2026-01-27T14:30:00"^^xsd:dateTime ;
+                             :medicationDosage "300mg" ;
+                             :medicationFrequency "Four times daily" ;
+                             :medicationDurationDays 7 ;
+                             :routeOfAdministration "Oral"^^xsd:string ;
+                             :hasNotes "Post-operative antibiotic prophylaxis. Safe for patients with penicillin allergy." ;
+                             rdfs:label "Clindamycin Prescription - Patient JD" .
+
+###  Pain Medication Prescription
+:Prescription_Ibuprofen_JD rdf:type owl:NamedIndividual , :MedicationPrescription , :SafePrescription ;
+                           :isPrescribedFor :Patient_JD ;
+                           :isPrescribedBy :Dr_Smith ;
+                           :hasPrescribedMedication :Ibuprofen ;
+                           :prescriptionDate "2026-01-27T14:35:00"^^xsd:dateTime ;
+                           :medicationDosage "400mg" ;
+                           :medicationFrequency "Every 6 hours as needed" ;
+                           :medicationDurationDays 14 ;
+                           :routeOfAdministration "Oral"^^xsd:string ;
+                           :hasNotes "Post-operative pain management." ;
+                           rdfs:label "Ibuprofen Prescription - Patient JD" .
+
+###  Surgical Procedure
+:Surgery_Tymp_001 rdf:type owl:NamedIndividual , :Tympanomastoidectomy ;
+                  :hasPrimarySurgeon :Dr_Smith ;
+                  :hasAssistingSurgeon :Dr_Johnson ;
+                  :hasParticipant :Patient_JD ;
+                  :isIndicatedFor :Condition_Cholesteatoma_L ;
+                  :procedureStartDate "2026-01-28T08:30:00"^^xsd:dateTime ;
+                  :procedureEndDate "2026-01-28T11:45:00"^^xsd:dateTime ;
+                  :usesDevice :Device_OssicularProsthesis_001 , :Device_Drill_001 ;
+                  :hasOutcome :Outcome_Surgery_001 ;
+                  :hasFollowUp :FollowUp_001 ;
+                  :hasReport :Report_Surgery_001 ;
+                  :hasNotes "Canal wall down tympanomastoidectomy with ossicular chain reconstruction. Complete cholesteatoma removal achieved." ;
+                  rdfs:label "Tympanomastoidectomy - Patient JD - Jan 2026" .
+
+###  Surgical Report
+:Report_Surgery_001 rdf:type owl:NamedIndividual , :MedicalReport ;
+                    :isReportFor :Surgery_Tymp_001 ;
+                    :reportDate "2026-01-28T12:30:00"^^xsd:dateTime ;
+                    :reportContent "Procedure: Canal wall down tympanomastoidectomy. Findings: Extensive cholesteatoma involving epitympanum and mastoid antrum. Procedure: Complete cholesteatoma removal. Ossicular chain reconstruction with titanium PORP. Facial nerve identified and preserved. Blood loss: 50ml. Anesthesia: General with allergy precautions (patient has severe penicillin allergy). Post-op: Stable to recovery." ;
+                    rdfs:label "Surgical Report - Tympanomastoidectomy 001" .
+
+###  Medical Devices
+:Device_OssicularProsthesis_001 rdf:type owl:NamedIndividual , :OssicularProsthesis ;
+                                :deviceSerialNumber "OSS-2024-789456" ;
+                                :deviceManufacturer "MedTech Implants Inc." ;
+                                :deviceModel "PORP-Titanium-5mm" ;
+                                :isUsedIn :Surgery_Tymp_001 ;
+                                :hasNotes "Partial ossicular replacement prosthesis (PORP) - Titanium" ;
+                                rdfs:label "Ossicular Prosthesis OSS-2024-789456" .
+
+:Device_Drill_001 rdf:type owl:NamedIndividual , :MedicalDevice ;
+                  :deviceSerialNumber "DRILL-2023-445566" ;
+                  :deviceManufacturer "Surgical Tools Corp." ;
+                  :deviceModel "OTO-DRILL-PRO-X" ;
+                  :isUsedIn :Surgery_Tymp_001 ;
+                  rdfs:label "Surgical Drill DRILL-2023-445566" .
+
+###  Surgery Outcome
+:Outcome_Surgery_001 rdf:type owl:NamedIndividual , :SuccessfulOutcome ;
+                     :isOutcomeOf :Surgery_Tymp_001 ;
+                     :hasNotes "Complete removal of cholesteatoma achieved. Ossicular chain reconstructed with PORP. Facial nerve preserved intact. No complications during procedure. Estimated blood loss: 50ml. Patient stable post-operatively." ;
+                     rdfs:label "Successful Outcome - Surgery Tymp 001" .
+
+###  Follow-up Appointment
+:FollowUp_001 rdf:type owl:NamedIndividual , :FollowUpAppointment ;
+              :isFollowUpFor :Surgery_Tymp_001 ;
+              :hasParticipant :Patient_JD ;
+              :isPerformedBy :Dr_Smith ;
+              :procedureStartDate "2026-02-11T14:00:00"^^xsd:dateTime ;
+              :procedureEndDate "2026-02-11T14:30:00"^^xsd:dateTime ;
+              :hasReport :Report_FollowUp_001 ;
+              :hasNotes "Post-operative check at 2 weeks. Surgical site healing well. No signs of infection. Patient reports reduced discharge and improved hearing. Continue current medications. Next follow-up in 4 weeks." ;
+              rdfs:label "Follow-up Appointment - Patient JD - Feb 2026" .
+
+:Report_FollowUp_001 rdf:type owl:NamedIndividual , :MedicalReport ;
+                     :isReportFor :FollowUp_001 ;
+                     :reportDate "2026-02-11T15:00:00"^^xsd:dateTime ;
+                     :reportContent "Post-operative follow-up at 2 weeks. Surgical site clean and healing well. No signs of infection. Patient reports subjective hearing improvement. Continue current medications. Plan: Follow-up in 4 weeks for further assessment and possible hearing test." ;
+                     rdfs:label "Follow-up Report - Patient JD" .
+
+###  Anatomical Structures with Part-Of Relationships
+:Anatomy_TemporalBone_L rdf:type owl:NamedIndividual , :TemporalBone ;
+                        :hasLaterality :Left ;
+                        rdfs:label "Left Temporal Bone" .
+
+:Anatomy_MiddleEar_L rdf:type owl:NamedIndividual , :MiddleEar ;
+                     :isPartOf :Anatomy_TemporalBone_L ;
+                     :hasLaterality :Left ;
+                     :isAffectedBy :Condition_Cholesteatoma_L ;
+                     rdfs:label "Left Middle Ear" .
+
+:Anatomy_LeftIncus rdf:type owl:NamedIndividual , :Incus ;
+                   :isPartOf :Anatomy_MiddleEar_L ;
+                   :hasLaterality :Left ;
+                   :isAffectedBy :Condition_Cholesteatoma_L ;
+                   rdfs:label "Left Incus" .
+
+:Anatomy_LeftMalleus rdf:type owl:NamedIndividual , :Malleus ;
+                     :isPartOf :Anatomy_MiddleEar_L ;
+                     :hasLaterality :Left ;
+                     rdfs:label "Left Malleus" .
+
+:Anatomy_LeftStapes rdf:type owl:NamedIndividual , :Stapes ;
+                    :isPartOf :Anatomy_MiddleEar_L ;
+                    :hasLaterality :Left ;
+                    rdfs:label "Left Stapes" .
+
+:Anatomy_LeftCochlea rdf:type owl:NamedIndividual , :Cochlea ;
+                     :isPartOf :Anatomy_TemporalBone_L ;
+                     :hasLaterality :Left ;
+                     rdfs:label "Left Cochlea" .
+
+:Anatomy_LeftTympanicMembrane rdf:type owl:NamedIndividual , :TympanicMembrane ;
+                              :isPartOf :Anatomy_MiddleEar_L ;
+                              :hasLaterality :Left ;
+                              rdfs:label "Left Tympanic Membrane" .
+
+###  Additional Patient - Mary Smith (for testing)
+:Patient_MS rdf:type owl:NamedIndividual , :Patient ;
+            :hasMedicalRecordNumber "MS987654" ;
+            :hasDateOfBirth "1975-08-23"^^xsd:date ;
+            :hasGender "Female"^^xsd:string ;
+            :hasWeightKg "65.0"^^xsd:decimal ;
+            :hasHeightCm "165.0"^^xsd:decimal ;
+            :hasDiagnosis :Condition_Otosclerosis_R ;
+            rdfs:label "Mary Smith" .
+
+:Condition_Otosclerosis_R rdf:type owl:NamedIndividual , :Otosclerosis ;
+                          :isDiagnosisOf :Patient_MS ;
+                          :hasLaterality :Right ;
+                          :affectsStructure :Anatomy_RightStapes ;
+                          :diagnosisDate "2026-01-10"^^xsd:date ;
+                          rdfs:label "Right Otosclerosis - Patient MS" ;
+                          :hasNotes "Progressive conductive hearing loss. Candidate for stapedectomy." .
+
+:Anatomy_RightStapes rdf:type owl:NamedIndividual , :Stapes ;
+                     :hasLaterality :Right ;
+                     :isAffectedBy :Condition_Otosclerosis_R ;
+                     rdfs:label "Right Stapes" .
+
+###  Example of Contraindicated Prescription (for testing safety detection)
+:Prescription_Amoxicillin_MS rdf:type owl:NamedIndividual , :MedicationPrescription ;
+                             :isPrescribedFor :Patient_MS ;
+                             :isPrescribedBy :Dr_Smith ;
+                             :hasPrescribedMedication :Amoxicillin ;
+                             :prescriptionDate "2026-02-01T10:00:00"^^xsd:dateTime ;
+                             :medicationDosage "500mg" ;
+                             :medicationFrequency "Three times daily" ;
+                             :medicationDurationDays 10 ;
+                             :routeOfAdministration "Oral"^^xsd:string ;
+                             :hasNotes "Test prescription for otitis media." ;
+                             rdfs:label "Amoxicillin Prescription - Patient MS" .
+
+#################################################################
+#    SWRL Rules for Safety Checks (Actual SWRL Syntax)
+#################################################################
+
+###  RULE 1: Detect Allergy-Medication Conflict via Drug Class
+###  If: Patient has allergy that contraindicates drug class
+###  And: Medication belongs to that drug class  
+###  And: Medication is prescribed to patient
+###  Then: Prescription is contraindicated
+:AllergyDrugClassRule rdf:type swrl:Imp ;
+    swrl:body [
+        rdf:type swrl:AtomList ;
+        rdf:first [
+            rdf:type swrl:ClassAtom ;
+            swrl:classPredicate :Patient ;
+            swrl:argument1 :p
+        ] ;
+        rdf:rest [
+            rdf:type swrl:AtomList ;
+            rdf:first [
+                rdf:type swrl:ClassAtom ;
+                swrl:classPredicate :Allergy ;
+                swrl:argument1 :a
+            ] ;
+            rdf:rest [
+                rdf:type swrl:AtomList ;
+                rdf:first [
+                    rdf:type swrl:ClassAtom ;
+                    swrl:classPredicate :DrugClass ;
+                    swrl:argument1 :dc
+                ] ;
+                rdf:rest [
+                    rdf:type swrl:AtomList ;
+                    rdf:first [
+                        rdf:type swrl:ClassAtom ;
+                        swrl:classPredicate :Medication ;
+                        swrl:argument1 :m
+                    ] ;
+                    rdf:rest [
+                        rdf:type swrl:AtomList ;
+                        rdf:first [
+                            rdf:type swrl:ClassAtom ;
+                            swrl:classPredicate :MedicationPrescription ;
+                            swrl:argument1 :rx
+                        ] ;
+                        rdf:rest rdf:nil
+                    ]
+                ]
+            ]
+        ]
+    ] ;
+    swrl:head [
+        rdf:type swrl:AtomList ;
+        rdf:first [
+            rdf:type swrl:ClassAtom ;
+            swrl:classPredicate :ContraindicatedPrescription ;
+            swrl:argument1 :rx
+        ] ;
+        rdf:rest rdf:nil
+    ] .
+
+###  RULE 2: Detect Allergy-Medication Conflict via Direct Medication
+###  If: Patient has allergy that directly contraindicates medication
+###  And: That medication is prescribed to patient
+###  Then: Prescription is contraindicated
+:AllergyMedicationRule rdf:type swrl:Imp ;
+    swrl:body [
+        rdf:type swrl:AtomList ;
+        rdf:first [
+            rdf:type swrl:ClassAtom ;
+            swrl:classPredicate :Patient ;
+            swrl:argument1 :p
+        ] ;
+        rdf:rest [
+            rdf:type swrl:AtomList ;
+            rdf:first [
+                rdf:type swrl:ClassAtom ;
+                swrl:classPredicate :Allergy ;
+                swrl:argument1 :a
+            ] ;
+            rdf:rest [
+                rdf:type swrl:AtomList ;
+                rdf:first [
+                    rdf:type swrl:ClassAtom ;
+                    swrl:classPredicate :Medication ;
+                    swrl:argument1 :m
+                ] ;
+                rdf:rest [
+                    rdf:type swrl:AtomList ;
+                    rdf:first [
+                        rdf:type swrl:ClassAtom ;
+                        swrl:classPredicate :MedicationPrescription ;
+                        swrl:argument1 :rx
+                    ] ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ]
+    ] ;
+    swrl:head [
+        rdf:type swrl:AtomList ;
+        rdf:first [
+            rdf:type swrl:ClassAtom ;
+            swrl:classPredicate :ContraindicatedPrescription ;
+            swrl:argument1 :rx
+        ] ;
+        rdf:rest rdf:nil
+    ] .
+
+###  RULE 3: Drug Interaction Warning
+###  If: Two medications interact
+###  And: Both are prescribed to same patient
+###  Then: Mark prescriptions for review
+:DrugInteractionRule rdf:type swrl:Imp ;
+    swrl:body [
+        rdf:type swrl:AtomList ;
+        rdf:first [
+            rdf:type swrl:ClassAtom ;
+            swrl:classPredicate :Medication ;
+            swrl:argument1 :m1
+        ] ;
+        rdf:rest [
+            rdf:type swrl:AtomList ;
+            rdf:first [
+                rdf:type swrl:ClassAtom ;
+                swrl:classPredicate :Medication ;
+                swrl:argument1 :m2
+            ] ;
+            rdf:rest [
+                rdf:type swrl:AtomList ;
+                rdf:first [
+                    rdf:type swrl:ClassAtom ;
+                    swrl:classPredicate :Patient ;
+                    swrl:argument1 :p
+                ] ;
+                rdf:rest [
+                    rdf:type swrl:AtomList ;
+                    rdf:first [
+                        rdf:type swrl:ClassAtom ;
+                        swrl:classPredicate :MedicationPrescription ;
+                        swrl:argument1 :rx1
+                    ] ;
+                    rdf:rest [
+                        rdf:type swrl:AtomList ;
+                        rdf:first [
+                            rdf:type swrl:ClassAtom ;
+                            swrl:classPredicate :MedicationPrescription ;
+                            swrl:argument1 :rx2
+                        ] ;
+                        rdf:rest rdf:nil
+                    ]
+                ]
+            ]
+        ]
+    ] ;
+    swrl:head [
+        rdf:type swrl:AtomList ;
+        rdf:first [
+            rdf:type swrl:ClassAtom ;
+            swrl:classPredicate :ContraindicatedPrescription ;
+            swrl:argument1 :rx1
+        ] ;
+        rdf:rest [
+            rdf:type swrl:AtomList ;
+            rdf:first [
+                rdf:type swrl:ClassAtom ;
+                swrl:classPredicate :ContraindicatedPrescription ;
+                swrl:argument1 :rx2
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+#################################################################
+#    General Axioms
+#################################################################
+
+###  Main entity type disjointness
+[] rdf:type owl:AllDisjointClasses ;
+   owl:members ( :Person :ClinicalProcess :Condition :AnatomicalStructure 
+                 :Medication :MedicationPrescription :DrugClass :Allergy 
+                 :MedicalDevice :Laterality :ProcedureOutcome :Complication 
+                 :MedicalReport ) .
+
+###  Person hierarchy disjointness
+[] rdf:type owl:AllDisjointClasses ;
+   owl:members ( :Patient :HealthcareProfessional ) .
+
+###  Healthcare professional specialties disjointness
+[] rdf:type owl:AllDisjointClasses ;
+   owl:members ( :Surgeon :Audiologist ) .
+
+###  Clinical process type disjointness
+[] rdf:type owl:AllDisjointClasses ;
+   owl:members ( :DiagnosticProcedure :TreatmentProcedure :Consultation ) .
+
+###  Hearing loss type disjointness
+[] rdf:type owl:AllDisjointClasses ;
+   owl:members ( :ConductiveHearingLoss :SensorineuralHearingLoss :MixedHearingLoss ) .
+
+###  Ear structure disjointness
+[] rdf:type owl:AllDisjointClasses ;
+   owl:members ( :ExternalEar :MiddleEar :InnerEar ) .
+
+###  Ossicle disjointness
+[] rdf:type owl:AllDisjointClasses ;
+   owl:members ( :Malleus :Incus :Stapes ) .
+
+###  Outcome disjointness
+[] rdf:type owl:AllDisjointClasses ;
+   owl:members ( :SuccessfulOutcome :UnsuccessfulOutcome :PartiallySuccessfulOutcome ) .
+
+###  Allergy severity subclass disjointness
+[] rdf:type owl:AllDisjointClasses ;
+   owl:members ( :MildAllergy :SevereAllergy :LifeThreateningAllergy ) .
+
+#################################################################
+#    End of Ontology
+#################################################################
